@@ -1,0 +1,57 @@
+﻿@model PosWebApp.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2 class="mt-4">Admin Dashboard</h2>
+
+<div class="row mt-4">
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Sales</h5>
+                <p class="card-text display-4">@Model.TotalSales.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Total Transactions</h5>
+                <p class="card-text display-4">@Model.TotalTransactions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-4">Daily Sales Report</h3>
+
+<div class="table-responsive">
+    <table class="table table-striped mt-2">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Total Sales</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.DailySales != null && Model.DailySales.Any())
+            {
+                @foreach (var day in Model.DailySales)
+                {
+                    <tr>
+                        <td>@day.SalesDate.ToShortDateString()</td>
+                        <td>@day.TotalAmount.ToString("C")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2">No sales data available.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
