@@ -25,14 +25,14 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index"><i class="fas fa-cash-register me-2"></i> Counter</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index"><i class="fas fa-box-open me-2"></i> Inventory</a>
-                            </li>
                             @if (User.IsInRole("Admin"))
                             {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index"><i class="fas fa-cash-register me-2"></i> Counter</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Inventory" asp-action="Index"><i class="fas fa-box-open me-2"></i> Inventory</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
                                 </li>
