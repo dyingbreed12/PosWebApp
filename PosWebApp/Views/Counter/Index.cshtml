@@ -1,6 +1,6 @@
 ﻿@{
-    var cart = (List<PosWebAppCommon.Models.Product>)ViewBag.Cart;
-    var total = cart.Sum(p => p.Price * p.Quantity);
+    var cart = (List<PosWebAppCommon.Models.Item>)ViewBag.Cart;
+    var total = cart.Sum(p => p.SellingPrice * p.Quantity);
 }
 <h2>Cashier Counter</h2>
 
@@ -29,9 +29,9 @@
             {
                 <tr>
                     <td>@item.ItemName</td>
-                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.SellingPrice.ToString("C")</td>
                     <td>@item.Quantity</td>
-                    <td>@(item.Price* item.Quantity).ToString("C")</td>
+                    <td>@(item.SellingPrice * item.Quantity).ToString("C")</td>
                 </tr>
             }
         }

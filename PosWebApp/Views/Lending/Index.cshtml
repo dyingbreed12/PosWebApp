@@ -1,0 +1,81 @@
+﻿@model IEnumerable<PosWebAppCommon.Models.Loan>
+@{
+    ViewData["Title"] = "Lending Management";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Lending Management</h2>
+    <a asp-action="Create" class="btn btn-primary mb-3"><i class="fas fa-plus-circle me-2"></i>Add New Loan</a>
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h4>Active Loans</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Loan Date</th>
+                            <th>Due Date</th>
+                            <th>Total Amount</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var loan in Model)
+                        {
+                            <tr>
+                                <td>@loan.CustomerId</td>
+                                <td>@loan.LoanDate.ToShortDateString()</td>
+                                <td>@loan.DueDate.ToShortDateString()</td>
+                                <td>@loan.TotalAmount.ToString("C")</td>
+                                <td>@loan.Balance.ToString("C")</td>
+                                <td>
+                                    <span class="badge @(loan.Status == "Active" ? "bg-success" : loan.Status == "Paid" ? "bg-info" : "bg-danger")">@loan.Status</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@loan.Id" class="btn btn-sm btn-info"><i class="fas fa-info-circle"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@loan.Id" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#paymentModal_@loan.Id"><i class="fas fa-money-check-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <div class="modal fade" id="paymentModal_@loan.Id" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form asp-action="MakePayment" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Record Payment for Loan #@loan.Id</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="loanId" value="@loan.Id" />
+                                                <div class="mb-3">
+                                                    <label class="form-label">Amount</label>
+                                                    <input type="number" class="form-control" name="paymentAmount" required />
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Notes (Optional)</label>
+                                                    <textarea class="form-control" name="notes"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Submit Payment</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

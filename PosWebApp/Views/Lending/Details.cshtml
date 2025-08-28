@@ -1,0 +1,61 @@
+﻿@model PosWebAppCommon.Models.Loan
+@{
+    ViewData["Title"] = "Loan Details";
+}
+<div class="container mt-4">
+    <h2>Loan Details</h2>
+    <hr />
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">Loan #@Model.Id</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Customer ID:</dt>
+                        <dd class="col-sm-8">@Model.CustomerId</dd>
+                        <dt class="col-sm-4">Loan Date:</dt>
+                        <dd class="col-sm-8">@Model.LoanDate.ToShortDateString()</dd>
+                        <dt class="col-sm-4">Due Date:</dt>
+                        <dd class="col-sm-8">@Model.DueDate.ToShortDateString()</dd>
+                        <dt class="col-sm-4">Total Amount:</dt>
+                        <dd class="col-sm-8">@Model.TotalAmount.ToString("C")</dd>
+                        <dt class="col-sm-4">Current Balance:</dt>
+                        <dd class="col-sm-8">@Model.Balance.ToString("C")</dd>
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">@Model.Status</dd>
+                        <dt class="col-sm-4">Notes:</dt>
+                        <dd class="col-sm-8">@Model.Notes</dd>
+                    </dl>
+                </div>
+            </div>
+            <h5 class="mt-4">Payment History</h5>
+            @if (!ViewBag.Payments.Any())
+            {
+                <div class="alert alert-info mt-3">No payments recorded for this loan.</div>
+            }
+            else
+            {
+                <table class="table table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th>Payment Date</th>
+                            <th>Amount Paid</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payment in ViewBag.Payments)
+                        {
+                            <tr>
+                                <td>@payment.PaymentDate.ToShortDateString()</td>
+                                <td>@payment.Amount.ToString("C")</td>
+                                <td>@payment.Notes</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    <a asp-action="Index" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Back to Loan List</a>
+</div>

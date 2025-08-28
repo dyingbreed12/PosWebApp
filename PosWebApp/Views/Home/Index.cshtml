@@ -1,57 +1,143 @@
 ﻿@model PosWebApp.Models.DashboardViewModel
+@using Newtonsoft.Json
 
 @{
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<h2 class="mt-4">Admin Dashboard</h2>
+<div class="container-fluid">
+    <h2 class="mt-4">Admin Dashboard</h2>
 
-<div class="row mt-4">
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Total Sales</h5>
-                <p class="card-text display-4">@Model.TotalSales.ToString("C")</p>
+    <div class="row mt-4">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-white bg-success shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total Sales (This Month)</h5>
+                        <p class="card-text display-4">$@Model.TotalSales.ToString("N2")</p>
+                    </div>
+                    <i class="fas fa-dollar-sign fa-3x"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-white bg-primary shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total Profit (This Month)</h5>
+                        <p class="card-text display-4">$@Model.TotalProfit.ToString("N2")</p>
+                    </div>
+                    <i class="fas fa-chart-line fa-3x"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-white bg-info shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total Transactions</h5>
+                        <p class="card-text display-4">@Model.TotalTransactions</p>
+                    </div>
+                    <i class="fas fa-receipt fa-3x"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-white bg-warning shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Low Stock Alerts</h5>
+                        <p class="card-text display-4">@Model.LowStockItems</p>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-3x"></i>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Total Transactions</h5>
-                <p class="card-text display-4">@Model.TotalTransactions</p>
+
+    <div class="row mt-4">
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Daily Sales (Last 7 Days)
+                </div>
+                <div class="card-body">
+                    <canvas id="dailySalesChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Top 5 Selling Items
+                </div>
+                <div class="card-body">
+                    <canvas id="topSellingItemsChart" style="height: 300px;"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<h3 class="mt-4">Daily Sales Report</h3>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Use Model data directly
+        var dailySales = @Html.Raw(JsonConvert.SerializeObject(Model.DailySales));
+        var topSellingItems = @Html.Raw(JsonConvert.SerializeObject(Model.TopSellingItems));
 
-<div class="table-responsive">
-    <table class="table table-striped mt-2">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Total Sales</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.DailySales != null && Model.DailySales.Any())
-            {
-                @foreach (var day in Model.DailySales)
-                {
-                    <tr>
-                        <td>@day.SalesDate.ToShortDateString()</td>
-                        <td>@day.TotalAmount.ToString("C")</td>
-                    </tr>
-                }
+        // Render Charts
+        // Daily Sales Chart
+        var dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
+        new Chart(dailySalesCtx, {
+            type: 'bar',
+            data: {
+                labels: dailySales.map(d => new Date(d.salesDate).toLocaleDateString()),
+                datasets: [{
+                    label: 'Sales',
+                    data: dailySales.map(d => d.totalSales),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
             }
-            else
-            {
-                <tr>
-                    <td colspan="2">No sales data available.</td>
-                </tr>
+        });
+
+        // Top Selling Items Chart
+        var topSellingCtx = document.getElementById('topSellingItemsChart').getContext('2d');
+        new Chart(topSellingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: topSellingItems.map(d => d.itemName),
+                datasets: [{
+                    label: 'Items Sold',
+                    data: topSellingItems.map(d => d.totalSold),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
             }
-        </tbody>
-    </table>
-</div>
+        });
+    </script>
+}

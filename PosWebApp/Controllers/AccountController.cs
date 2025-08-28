@@ -1,11 +1,8 @@
-﻿using BCrypt.Net;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using PosWebApp.Models;
 using PosWebApp.Models.ViewModel;
 using PosWebAppBusinessLogic.Interfaces;
-using PosWebAppBusinessLogic.Repositories;
 using PosWebAppCommon.Models;
 using System.Security.Claims;
 
@@ -31,7 +28,7 @@ namespace PosWebApp.Controllers
         {
             if (!ModelState.IsValid) return View(vm);
 
-            var user = await _userRepo.GetByUsernameAsync(vm.Username);
+            var user = await _userRepo.GetUserByUsername(vm.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(vm.Password, user.PasswordHash))
             {

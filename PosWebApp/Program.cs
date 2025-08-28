@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using PosWebApp.Context;
+using PosWebAppBusinessLogic.Common;
 using PosWebAppBusinessLogic.Interfaces;
 using PosWebAppBusinessLogic.Repositories;
 using PosWebAppBusinessLogic.Services;
@@ -35,14 +36,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 // Register the DapperContext with its interface
 builder.Services.AddSingleton<IDapperContext, DapperContext>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped(typeof(IGenericDapperRepository<>), typeof(GenericDapperRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>(); // Add the new repository
 builder.Services.AddScoped<DashboardRepository>(); // Add the new repository
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<DashboardService>();
-
+builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
+builder.Services.AddScoped<ReportsService>();
+builder.Services.AddScoped<ILoanRepository, LoanRepository>();
+builder.Services.AddScoped<LendingService>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<PayrollService>();
 var app = builder.Build();
 
 // Middleware

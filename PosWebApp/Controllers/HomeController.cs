@@ -1,38 +1,38 @@
-// Controllers/HomeController.cs
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PosWebApp.Models;
-using PosWebAppBusinessLogic.Repositories;
 using PosWebAppBusinessLogic.Services;
 using System.Diagnostics;
+using PosWebAppCommon; // Reference the common library for the DTO
 
 namespace PosWebApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly DashboardRepository _dashboardRepo;
         private readonly DashboardService _dashboardService;
 
-        public HomeController(ILogger<HomeController> logger, DashboardRepository dashboardRepo, DashboardService  dashboardService)
+        public HomeController(ILogger<HomeController> logger, DashboardService dashboardService)
         {
             _logger = logger;
-            _dashboardRepo = dashboardRepo;
             _dashboardService = dashboardService;
         }
 
-        [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var dashboardData = _dashboardService.GetDashboardData();
+            // Get data from the service layer
+            var dashboardData = await _dashboardService.GetDashboardData();
 
+            // Map the DTO to the View Model
             var viewModel = new DashboardViewModel
             {
                 TotalSales = dashboardData.TotalSales,
+                TotalProfit = dashboardData.TotalProfit,
                 TotalTransactions = dashboardData.TotalTransactions,
-                DailySales = dashboardData.DailySales
+                LowStockItems = dashboardData.LowStockItems,
+                DailySales = dashboardData.DailySales,
+                TopSellingItems = dashboardData.TopSellingItems
             };
 
             return View(viewModel);

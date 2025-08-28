@@ -1,0 +1,43 @@
+﻿@model IEnumerable<PosWebAppCommon.Models.Paycheck>
+@{
+    ViewData["Title"] = "Paycheck History";
+}
+<div class="container mt-4">
+    <h2>Paycheck History</h2>
+    <hr />
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No paycheck history found for this employee.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Pay Period Start</th>
+                        <th>Pay Period End</th>
+                        <th>Gross Pay</th>
+                        <th>Deductions</th>
+                        <th>Net Pay</th>
+                        <th>Pay Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var paycheck in Model)
+                    {
+                        <tr>
+                            <td>@paycheck.PayPeriodStart.ToShortDateString()</td>
+                            <td>@paycheck.PayPeriodEnd.ToShortDateString()</td>
+                            <td>@paycheck.GrossPay.ToString("C")</td>
+                            <td>@paycheck.Deductions.ToString("C")</td>
+                            <td>@paycheck.NetPay.ToString("C")</td>
+                            <td>@paycheck.PayDate.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    <a asp-action="Index" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left me-2"></i>Back to Employee List</a>
+</div>

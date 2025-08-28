@@ -1,10 +1,10 @@
-﻿using PosWebAppCommon.Models;
+﻿using PosWebAppBusinessLogic.Common;
+using PosWebAppCommon.Models;
 
 namespace PosWebAppBusinessLogic.Interfaces
 {
-    public interface IUserRepository
+    public interface IUserRepository : IGenericDapperRepository<User>
     {
-        Task<User?> GetByUsernameAsync(string username);
-        Task<int> CreateAsync(User user);
+        Task<User?> GetUserByUsername(string username);
     }
 }

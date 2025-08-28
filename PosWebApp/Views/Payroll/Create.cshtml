@@ -1,0 +1,40 @@
+﻿@model PosWebAppCommon.Models.Employee
+@{
+    ViewData["Title"] = "Add Employee";
+}
+<div class="container mt-4">
+    <h2>Add New Employee</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Position" class="form-label"></label>
+                    <input asp-for="Position" class="form-control" />
+                    <span asp-validation-for="Position" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Salary" class="form-label"></label>
+                    <input asp-for="Salary" class="form-control" />
+                    <span asp-validation-for="Salary" class="text-danger"></span>
+                </div>
+                <div class="form-check mb-3">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
+                <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Back to List</a>
+            </form>
+        </div>
+    </div>
+</div>

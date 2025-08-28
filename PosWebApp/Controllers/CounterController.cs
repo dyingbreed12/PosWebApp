@@ -14,13 +14,11 @@ namespace PosWebApp.Controllers
     {
         private readonly IInventoryRepository _inventoryRepository;
         private readonly ISalesRepository _salesRepository;
-        private readonly IProductRepository  _productRepository;
 
-        public CounterController(IInventoryRepository inventoryRepository, ISalesRepository salesRepository, IProductRepository productRepository)
+        public CounterController(IInventoryRepository inventoryRepository, ISalesRepository salesRepository)
         {
             _inventoryRepository = inventoryRepository;
             _salesRepository = salesRepository;
-            _productRepository = productRepository;
         }
 
         public IActionResult Index()
@@ -33,18 +31,18 @@ namespace PosWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(string itemName)
         {
-            var product = await  _productRepository.GetProductByName(itemName);
+            var product = await _inventoryRepository.GetProductByName(itemName);
             if (product != null && product.Quantity > 0)
             {
                 var cart = GetCartFromSession();
-                var cartItem = cart.FirstOrDefault(i => i.ItemId == product.ItemId);
+                var cartItem = cart.FirstOrDefault(i => i.Id == product.Id);
                 if (cartItem != null)
                 {
                     cartItem.Quantity++;
                 }
                 else
                 {
-                    cart.Add(new Product { ItemId = product.ItemId, ItemName = product.ItemName, Price = product.Price, Quantity = 1 });
+                    cart.Add(new Item { Id = product.Id, ItemName = product.ItemName, SellingPrice = product.SellingPrice, Quantity = 1 });
                 }
                 SaveCartToSession(cart);
             }
@@ -58,17 +56,17 @@ namespace PosWebApp.Controllers
             if (cart.Any())
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                var totalAmount = cart.Sum(item => item.Price * item.Quantity);
+                var totalAmount = cart.Sum(item => item.SellingPrice * item.Quantity);
 
                 var transactionId = await _salesRepository.CreateSalesTransaction(totalAmount, userId);
 
                 var transactionItems = cart.Select(item => new TransactionItem
                 {
                     TransactionId = transactionId,
-                    ItemId = item.ItemId,
+                    ItemId = item.Id,
                     ItemName = item.ItemName,
                     Quantity = item.Quantity,
-                    PricePerItem = item.Price,
+                    PricePerItem = item.SellingPrice,
                     UserId = userId
                 });
 
@@ -76,7 +74,7 @@ namespace PosWebApp.Controllers
 
                 foreach (var item in cart)
                 {
-                   await _productRepository.DecrementProductQuantity(item.ItemId, item.Quantity);
+                   await _inventoryRepository.DecrementProductQuantity(item.Id, item.Quantity);
                 }
 
                 HttpContext.Session.Remove("Cart");
@@ -85,13 +83,13 @@ namespace PosWebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        private List<Product> GetCartFromSession()
+        private List<Item> GetCartFromSession()
         {
             var cartJson = HttpContext.Session.GetString("Cart");
-            return string.IsNullOrEmpty(cartJson) ? new List<Product>() : JsonSerializer.Deserialize<List<Product>>(cartJson);
+            return string.IsNullOrEmpty(cartJson) ? new List<Item>() : JsonSerializer.Deserialize<List<Item>>(cartJson);
         }
 
-        private void SaveCartToSession(List<Product> cart)
+        private void SaveCartToSession(List<Item> cart)
         {
             var cartJson = JsonSerializer.Serialize(cart);
             HttpContext.Session.SetString("Cart", cartJson);

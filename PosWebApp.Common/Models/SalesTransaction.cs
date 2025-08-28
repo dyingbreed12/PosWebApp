@@ -1,8 +1,7 @@
 ﻿namespace PosWebAppCommon.Models
 {
-    public class SalesTransaction
+    public class SalesTransaction : BaseEntity
     {
-        public int TransactionId { get; set; }
         public DateTime TransactionDate { get; set; }
         public decimal TotalAmount { get; set; }
         public int UserId { get; set; }

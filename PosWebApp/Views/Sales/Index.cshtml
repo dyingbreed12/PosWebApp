@@ -1,51 +1,35 @@
-﻿@{
-    var cart = (List<PosWebAppCommon.Models.Product>)ViewBag.Cart;
-    var total = cart.Sum(p => p.Price * p.Quantity);
-}
-<h2>Cashier Counter</h2>
-
-<form asp-controller="Sales" asp-action="AddToCart" method="post">
-    <div class="form-group">
-        <label for="itemName">Item Name</label>
-        <input type="text" id="itemName" name="itemName" class="form-control" />
+﻿<div class="row">
+    <div class="col-md-8">
+        <h2>POS Counter</h2>
+        <form id="addToCartForm">
+            <div class="input-group mb-3">
+                <input type="text" id="skuInput" class="form-control" placeholder="Scan or enter item SKU" autofocus />
+                <button class="btn btn-primary" type="submit">Add Item</button>
+            </div>
+        </form>
+        <div class="mt-4">
+            <h4>Current Cart</h4>
+            <table id="cartTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <strong>Total:</strong>
+                <strong id="totalAmountDisplay">$0.00</strong>
+            </div>
+            <button id="completeTransactionBtn" class="btn btn-success mt-3">Complete Transaction</button>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary mt-2">Add to Cart</button>
-</form>
+</div>
 
-<h3 class="mt-4">Current Transaction</h3>
-<table class="table mt-2">
-    <thead>
-        <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (cart != null && cart.Any())
-        {
-            @foreach (var item in cart)
-            {
-                <tr>
-                    <td>@item.ItemName</td>
-                    <td>@item.Price.ToString("C")</td>
-                    <td>@item.Quantity</td>
-                    <td>@(item.Price* item.Quantity).ToString("C")</td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4">No items in the cart.</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<h4 class="mt-4">Total: @total.ToString("C")</h4>
-
-<form asp-controller="Sales" asp-action="CompleteTransaction" method="post" class="mt-4">
-    <button type="submit" class="btn btn-success">Complete Transaction</button>
-</form>
+@section Scripts {
+    <script src="~/js/sales.js" asp-append-version="true"></script>
+}

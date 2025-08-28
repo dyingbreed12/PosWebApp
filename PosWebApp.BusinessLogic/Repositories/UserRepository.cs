@@ -1,39 +1,26 @@
 ﻿using Dapper;
+using PosWebAppBusinessLogic.Common;
 using PosWebAppBusinessLogic.Interfaces;
 using PosWebAppCommon.Interfaces;
 using PosWebAppCommon.Models;
 
 namespace PosWebAppBusinessLogic.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : GenericDapperRepository<User>, IUserRepository
     {
         private readonly IDapperContext _context;
 
-        public UserRepository(IDapperContext context)
+        public UserRepository(IDapperContext context) : base(context, "Users")
         {
             _context = context;
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public async Task<User?> GetUserByUsername(string username)
         {
-            var sql = "SELECT * FROM Users WHERE Username = @username AND IsActive = 1";
+            var sql = "SELECT * FROM Users WHERE Username = @Username";
             using (var connection = _context.CreateConnection())
             {
-                var user = await connection.QueryAsync<User>(sql, new { username });
-
-                return user.FirstOrDefault(); 
-            }
-        }
-
-        public async Task<int> CreateAsync(User user)
-        {
-            var sql = @"INSERT INTO Users (Username, PasswordHash, Role) 
-                        VALUES (@Username, @PasswordHash, @Role);
-                        SELECT CAST(SCOPE_IDENTITY() as int);";
-
-            using (var connection = _context.CreateConnection())
-            {
-               return await connection.ExecuteScalarAsync<int>(sql, user);
+                return await connection.QuerySingleOrDefaultAsync<User>(sql, new { Username = username });
             }
         }
     }

@@ -1,80 +1,50 @@
 ﻿using Dapper;
+using PosWebAppBusinessLogic.Common;
 using PosWebAppBusinessLogic.Interfaces;
 using PosWebAppCommon.Interfaces;
 using PosWebAppCommon.Models;
-using System.Data;
 
 namespace PosWebAppBusinessLogic.Repositories
 {
-    public class InventoryRepository : IInventoryRepository
+    // The repository now inherits from the generic Dapper repository
+    public class InventoryRepository : GenericDapperRepository<Item>, IInventoryRepository
     {
         private readonly IDapperContext _context;
 
-        public InventoryRepository(IDapperContext context)
+        public InventoryRepository(IDapperContext context) : base(context, "Inventory")
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<Product>> GetAllItemsAsync()
+        public async Task<Item?> GetProductBySku(string sku)
         {
-            var sql = "SELECT * FROM Inventory ORDER BY ItemName";
-            using (IDbConnection connection = _context.CreateConnection())
+            var sql = "SELECT * FROM Inventory WHERE SKU = @Sku";
+            using (var connection = _context.CreateConnection())
             {
-                return await connection.QueryAsync<Product>(sql);
+                return await connection.QuerySingleOrDefaultAsync<Item>(sql, new { Sku = sku });
             }
         }
 
-        public async Task<Product?> GetItemByIdAsync(int itemId)
+        public async Task<bool> DecrementProductQuantity(int productId, int quantityToDecrement)
         {
-            var sql = "SELECT * FROM Inventory WHERE ItemId = @ItemId";
-            using (IDbConnection connection = _context.CreateConnection())
+            var sql = @"
+                UPDATE Inventory
+                SET Quantity = Quantity - @QuantityToDecrement
+                WHERE ItemId = @ProductId AND Quantity >= @QuantityToDecrement;";
+
+            using (var connection = _context.CreateConnection())
             {
-                return await connection.QuerySingleOrDefaultAsync<Product>(sql, new { ItemId = itemId });
+                var rowsAffected = await connection.ExecuteAsync(sql, new { ProductId = productId, QuantityToDecrement = quantityToDecrement });
+                return rowsAffected > 0;
             }
         }
 
-        public async Task<Product?> GetItemByNameAsync(string itemName)
+        public async Task<Item?> GetProductByName(string itemName)
         {
             var sql = "SELECT * FROM Inventory WHERE ItemName = @ItemName";
-            using (IDbConnection connection = _context.CreateConnection())
+            using (var connection = _context.CreateConnection())
             {
-                return await connection.QuerySingleOrDefaultAsync<Product>(sql, new { ItemName = itemName });
-            }
-        }
-
-        public async Task<int> AddItemAsync(Product product)
-        {
-            var sql = "INSERT INTO Inventory (ItemName, Quantity, Price) VALUES (@ItemName, @Quantity, @Price)";
-            using (IDbConnection connection = _context.CreateConnection())
-            {
-                return await connection.ExecuteAsync(sql, new { product.ItemName, product.Quantity, product.Price });
-            }
-        }
-
-        public async Task<int> UpdateItemAsync(Product product)
-        {
-            var sql = "UPDATE Inventory SET ItemName = @ItemName, Quantity = @Quantity, Price = @Price WHERE ItemId = @ItemId";
-            using (IDbConnection connection = _context.CreateConnection())
-            {
-                return await connection.ExecuteAsync(sql, product);
-            }
-        }
-
-        public async Task<int> DeleteItemAsync(int itemId)
-        {
-            var sql = "DELETE FROM Inventory WHERE ItemId = @ItemId";
-            using (IDbConnection connection = _context.CreateConnection())
-            {
-                return await connection.ExecuteAsync(sql, new { ItemId = itemId });
-            }
-        }
-
-        public async Task<int> DecrementItemQuantityAsync(int itemId, int quantity)
-        {
-            var sql = "UPDATE Inventory SET Quantity = Quantity - @quantity WHERE ItemId = @ItemId AND Quantity >= @quantity";
-            using (IDbConnection connection = _context.CreateConnection())
-            {
-                return await connection.ExecuteAsync(sql, new { itemId, quantity });
+                return await connection.QuerySingleOrDefaultAsync<Item>(sql, new { ItemName = itemName });
             }
         }
     }
