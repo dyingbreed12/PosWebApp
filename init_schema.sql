@@ -1,11 +1,4 @@
--- Drop the existing database if it exists to start fresh
-IF DB_ID('PosDb') IS NOT NULL
-BEGIN
-    ALTER DATABASE PosDb SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE PosDb;
-END
 GO
-
 -- Create the new database
 CREATE DATABASE PosDb;
 GO
