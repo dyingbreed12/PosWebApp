@@ -1,5 +1,5 @@
 ﻿using PosWebAppBusinessLogic.Interfaces;
-using PosWebAppCommon;
+using PosWebAppCommon.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

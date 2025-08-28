@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - POS</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/materia/bootstrap.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/materia/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PosWebApp.styles.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" role="navigation" aria-label="Main navigation">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">POS App</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -24,14 +25,14 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity.IsAuthenticated)
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index"><i class="fas fa-cash-register me-2"></i> Counter</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index"><i class="fas fa-box-open me-2"></i> Inventory</a>
+                            </li>
                             @if (User.IsInRole("Admin"))
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index"><i class="fas fa-cash-register me-2"></i> Cashier</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Inventory" asp-action="Index"><i class="fas fa-box-open me-2"></i> Inventory</a>
-                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
                                 </li>
@@ -57,7 +58,7 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "active" : "")" asp-area="" asp-controller="Account" asp-action="Login" aria-current="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "page" : null)">Login</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                         }
                     </ul>
@@ -79,9 +80,44 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 
+    <div class="modal fade" id="globalConfirmModal" tabindex="-1" aria-labelledby="globalConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="globalConfirmModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="globalConfirmModalBody">
+                    Are you sure you want to proceed?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="globalConfirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global JavaScript function to show the confirmation modal
+        function showConfirmModal(message, callback) {
+            var myModal = new bootstrap.Modal(document.getElementById('globalConfirmModal'));
+            document.getElementById('globalConfirmModalBody').innerText = message;
+
+            // Set the callback for the confirm button
+            document.getElementById('globalConfirmBtn').onclick = function() {
+                myModal.hide();
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
+            };
+
+            myModal.show();
+        }
+    </script>
 </body>
 </html>

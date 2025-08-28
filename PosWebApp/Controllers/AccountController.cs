@@ -24,7 +24,7 @@ namespace PosWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginVm vm)
+        public async Task<IActionResult> Login(LoginViewModel vm)
         {
             if (!ModelState.IsValid) return View(vm);
 

@@ -1,4 +1,4 @@
-﻿using PosWebAppCommon;
+﻿using PosWebAppCommon.DTOs;
 
 namespace PosWebAppBusinessLogic.Interfaces
 {

@@ -1,5 +1,5 @@
 ﻿using PosWebAppBusinessLogic.Interfaces;
-using PosWebAppCommon; // Use the DTO from the common library
+using PosWebAppCommon.DTOs; // Use the DTO from the common library
 
 namespace PosWebAppBusinessLogic.Services
 {

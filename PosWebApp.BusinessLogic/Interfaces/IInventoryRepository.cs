@@ -8,5 +8,6 @@ namespace PosWebAppBusinessLogic.Interfaces
         Task<Item?> GetProductBySku(string sku);
         Task<bool> DecrementProductQuantity(int productId, int quantityToDecrement);
         Task<Item?> GetProductByName(string itemName);
+        Task<IEnumerable<Item>> SearchItems(string query);
     }
 }

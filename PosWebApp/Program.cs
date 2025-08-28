@@ -7,8 +7,16 @@ using PosWebAppBusinessLogic.Repositories;
 using PosWebAppBusinessLogic.Services;
 using PosWebAppCommon.Interfaces;
 using System.Data;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 
 // Add MVC
 builder.Services.AddControllersWithViews();
@@ -49,6 +57,8 @@ builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<LendingService>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<PayrollService>();
+builder.Services.AddScoped<InventoryService>();
+
 var app = builder.Build();
 
 // Middleware

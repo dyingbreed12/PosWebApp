@@ -19,18 +19,22 @@ namespace PosWebAppBusinessLogic.Repositories
             var sql = "INSERT INTO SalesTransactions (TotalAmount, UserId) VALUES (@TotalAmount, @UserId); SELECT SCOPE_IDENTITY();";
             using (var connection = _context.CreateConnection())
             {
-                var transactionId = await connection.QueryAsync<int>(sql, new { TotalAmount = totalAmount, UserId = userId });
-
-                return transactionId.Single();
+                // This will execute the query and return the new Id
+                return await connection.ExecuteScalarAsync<int>(sql, new { TotalAmount = totalAmount, UserId = userId });
             }
         }
 
         public async Task AddTransactionItems(IEnumerable<TransactionItem> items)
         {
-            var sql = "INSERT INTO SalesTransactions (TotalAmount, UserId) VALUES (@Quantity, @UserId); SELECT SCOPE_IDENTITY();";
+            // The SQL query should insert into the TransactionItems table, not SalesTransactions
+            var sql = @"
+                INSERT INTO TransactionItems (TransactionId, ItemId, ItemName, Quantity, PricePerItem)
+                VALUES (@TransactionId, @ItemId, @ItemName, @Quantity, @PricePerItem);";
+
             using (var connection = _context.CreateConnection())
             {
-                var transactionId = await connection.ExecuteAsync(sql, items);
+                // Dapper's ExecuteAsync method is perfect for inserting a list of items
+                await connection.ExecuteAsync(sql, items);
             }
         }
     }

@@ -1,35 +1,100 @@
-﻿<div class="row">
-    <div class="col-md-8">
-        <h2>POS Counter</h2>
-        <form id="addToCartForm">
+﻿@{
+    ViewData["Title"] = "Sales Counter";
+}
+
+@model PosWebApp.Models.ViewModel.SalesViewModel
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-7">
+            <h2>Sales Counter</h2>
             <div class="input-group mb-3">
-                <input type="text" id="skuInput" class="form-control" placeholder="Scan or enter item SKU" autofocus />
-                <button class="btn btn-primary" type="submit">Add Item</button>
+                <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Search by name or SKU" autofocus autocomplete="off" />
+                <button type="button" class="btn btn-primary" id="searchBtn">Search</button>
             </div>
-        </form>
-        <div class="mt-4">
-            <h4>Current Cart</h4>
-            <table id="cartTable" class="table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between">
-                <strong>Total:</strong>
-                <strong id="totalAmountDisplay">$0.00</strong>
+            <div class="mt-4">
+                <h4>Current Cart</h4>
+                <div class="table-responsive">
+                    <table id="cartTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Cart != null)
+                            {
+                                @foreach (var item in Model.Cart)
+                                {
+                                    <tr>
+                                        <td>@item.ItemName</td>
+                                        <td><input type="number" class="form-control item-quantity" data-item-id="@item.Id" value="@item.Quantity" min="1" style="width: 90px;"></td>
+                                        <td>₱@item.SellingPrice.ToString("F2")</td>
+                                        <td>₱@((item.SellingPrice * item.Quantity).ToString("F2"))</td>
+                                        <td><button class="btn btn-danger btn-sm remove-item" data-item-id="@item.Id">Remove</button></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card p-3 shadow-sm mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Total Due:</strong>
+                        @{
+                            decimal totalDue = Model.Cart?.Sum(item => (decimal)item.SellingPrice * (int)item.Quantity) ?? 0;
+                        }
+                        <strong id="totalDueDisplay" class="fs-4">₱@totalDue.ToString("F2")</strong>
+                    </div>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text">Cash</span>
+                        <input type="number" id="cashPaidInput" class="form-control form-control-lg text-end" value="0.00" step="0.01" />
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Change:</strong>
+                        <strong id="changeDisplay" class="fs-4">₱0.00</strong>
+                    </div>
+                </div>
+                <button id="completeTransactionBtn" class="btn btn-success w-100 mt-3">Complete Transaction</button>
             </div>
-            <button id="completeTransactionBtn" class="btn btn-success mt-3">Complete Transaction</button>
+        </div>
+        <div class="col-md-5 border-start ps-4">
+            <h4>Products</h4>
+            <div id="productResults" class="row row-cols-1 row-cols-md-2 g-4">
+                @if (Model.Products != null)
+                {
+                    @foreach (var item in Model.Products)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm" style="cursor:pointer;">
+                                <div class="card-body">
+                                    <h5 class="card-title">@item.ItemName</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">@item.SKU</h6>
+                                    <p class="card-text fw-bold">₱@item.SellingPrice.ToString("F2")</p>
+                                    <p class="card-text text-muted small">In Stock: @item.Quantity</p>
+                                    <button class="btn btn-primary add-item-btn mt-2" data-item-sku="@item.SKU">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script>
+        var searchUrl = '@Url.Action("SearchItem", "Sales")';
+        var addToCartUrl = '@Url.Action("AddToCart", "Sales")';
+        var removeFromCartUrl = '@Url.Action("RemoveFromCart", "Sales")';
+        var updateQuantityUrl = '@Url.Action("UpdateQuantity", "Sales")';
+        var completeTransactionUrl = '@Url.Action("CompleteTransaction", "Sales")';
+    </script>
     <script src="~/js/sales.js" asp-append-version="true"></script>
 }

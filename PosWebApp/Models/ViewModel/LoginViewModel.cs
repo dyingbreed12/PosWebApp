@@ -2,7 +2,7 @@
 
 namespace PosWebApp.Models.ViewModel
 {
-    public class LoginVm
+    public class LoginViewModel
     {
         [Required]
         public string Username { get; set; }

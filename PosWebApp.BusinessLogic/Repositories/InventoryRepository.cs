@@ -30,7 +30,7 @@ namespace PosWebAppBusinessLogic.Repositories
             var sql = @"
                 UPDATE Inventory
                 SET Quantity = Quantity - @QuantityToDecrement
-                WHERE ItemId = @ProductId AND Quantity >= @QuantityToDecrement;";
+                WHERE Id = @ProductId AND Quantity >= @QuantityToDecrement;";
 
             using (var connection = _context.CreateConnection())
             {
@@ -45,6 +45,17 @@ namespace PosWebAppBusinessLogic.Repositories
             using (var connection = _context.CreateConnection())
             {
                 return await connection.QuerySingleOrDefaultAsync<Item>(sql, new { ItemName = itemName });
+            }
+        }
+
+        public async Task<IEnumerable<Item>> SearchItems(string query)
+        {
+            var sql = @"
+        SELECT TOP 10 * FROM Inventory 
+        WHERE ItemName LIKE '%' + @query + '%' OR SKU LIKE '%' + @query + '%'";
+            using (var connection = _context.CreateConnection())
+            {
+                return await connection.QueryAsync<Item>(sql, new { query });
             }
         }
     }

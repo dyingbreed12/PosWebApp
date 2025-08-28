@@ -1,4 +1,4 @@
-﻿namespace PosWebAppCommon
+﻿namespace PosWebAppCommon.DTOs
 {
     public class TopSellingItemDto
     {

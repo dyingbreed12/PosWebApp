@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using PosWebAppBusinessLogic.Interfaces;
-using PosWebAppCommon;
+using PosWebAppCommon.DTOs;
 using PosWebAppCommon.Interfaces;
 using System.Collections.Generic;
 using System.Data;
